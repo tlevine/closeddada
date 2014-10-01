@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker
 
-from .web_email.load import piwik_email
+from .web_email.load import ipaddress_email, piwik_email
 from .web_email.model import PiwikEmailOverlap
 
 def load(engine):

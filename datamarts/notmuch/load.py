@@ -63,11 +63,12 @@ def offlineimap_is_running():
     stdout, stderr = pgrep.communicate()
     return len(stdout) > 0
 
-def addresses(m):
+def addresses(pyzm):
+    '''
+    If I rewrite this not to use pyzm, I can use the notmuch indices,
+    and it might be way faster.
+    '''
     headers = ['to', 'cc', 'bcc']
-    with open(m.get_filename(), 'rb') as fp:
-        pyzm = pyzmail.PyzMessage.factory(fp)
-
     tos = pyzm.get_addresses('to')
     if len(tos) == 0:
         from_name = from_address = None
@@ -82,12 +83,22 @@ def addresses(m):
 
     return from_name, from_address, recipient_names, recipient_addresses
 
-
+MAILING_LIST_HEADERS = [
+    'List-Id', # Google Groups, Mailman
+    'List-Unsubscribe', # LISTSERV, "cmail.dickblick", ConstantContact, Mailchimp
+    'X-Campaign', # ConstantContact, Mailchimp
+    'X-CiviMail-Bounce', # CiviCRM
+]
 def message(m): 
     filename = m.get_filename()
     subject = m.get_header('subject')
 
-    from_name, from_address, recipient_names, recipient_addresses = addresses(m)
+    with open(m.get_filename(), 'rb') as fp:
+        pyzm = pyzmail.PyzMessage.factory(fp)
+    from_name, from_address, recipient_names, recipient_addresses = addresses(pyzm)
+
+    is_mailing_list = 'undisclosed-recipients' in m.get_header('to') or \
+        any(m.get_header(header) != '' for header in MAILING_LIST_HEADERS)
 
     return NotmuchMessage(
         message_id = m.get_message_id(),
@@ -99,6 +110,7 @@ def message(m):
         from_address = from_address,
         recipient_names = recipient_names,
         recipient_addresses = recipient_names,
+        is_mailing_list = is_mailing_list,
     )
 
 def attachments(message):

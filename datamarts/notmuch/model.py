@@ -14,6 +14,7 @@ class NotmuchMessage(m.Fact):
     from_address = m.Column(s.String, default = '')
     recipient_names = m.Column(ARRAY(s.String))
     recipient_addresses = m.Column(ARRAY(s.String, dimensions = 1))
+    is_mailing_list = m.Column(s.Boolean)
 
 class NotmuchAttachment(m.Fact):
     message_id = m.Column(s.String,

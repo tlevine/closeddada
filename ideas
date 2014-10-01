@@ -8,3 +8,13 @@ Consider this scatterplot matrix.
 
 I want to select the scatterplots with high correlations
 within this matrix.
+
+
+SELECT *
+FROM cube_piwikemailoverlap
+WHERE email_address != ''
+  AND intersecting_dates >= 2
+ORDER BY
+  email_address,
+  100 * intersecting_dates / unioned_dates
+DESC;

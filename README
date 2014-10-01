@@ -124,3 +124,8 @@ http://pygeoip.readthedocs.org/en/latest/getting-started.html
 
 Switch to the visit and action Piwik API modules, and also add the visitor profile.
 http://piwik.thomaslevine.com/?module=API&method=Live.getVisitorProfile&idSite=2&format=JSON&token_auth=foo&visitorId=bar
+
+
+Make email addresses insensitive of case.
+
+Add an "is_list" column to notmuch messages.
