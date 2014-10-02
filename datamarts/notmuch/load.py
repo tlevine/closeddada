@@ -52,7 +52,9 @@ def update(sessionmaker):
 
         session.add(message(m))
         session.flush() # for foreign key constraints
-        session.add_all(attachments(m))
+
+        # I don't really need these, and it takes a long time.
+    #   session.add_all(attachments(m))
 
         session.commit()
         logger.info('Added message "id:%s"' % m.get_message_id())
@@ -92,9 +94,11 @@ def message(m):
     )
 
 unquoted_name = p.Combine(p.OneOrMore(p.Word(exclude_chars = '<')))
-quoted_name = p.Group('"' + unquoted_name + '"')
-name = p.Or(unquoted_name, quoted_name)
-addresses = p.OneOrMore(name + p.Word(p.printables))
+quoted_name = p.Group('"' + unquoted_name + p.Suppress('"'))
+name = p.Or([unquoted_name, quoted_name])
+addresses = p.OneOrMore(p.Or([
+    name + p.Suppress('<') + p.Word(p.printables) + p.Suppress('>'),
+    p.Word(printables)]))
 
 def attachments(message):
     with open(message.get_filename(), 'rb') as fp:
