@@ -1,3 +1,5 @@
+import nose.tools as n
+
 from ..parse_addresses import addresses
 
 TESTCASES = [
@@ -6,8 +8,8 @@ TESTCASES = [
 ]
 
 def check(raw, parsed):
-    n.assert_equal(addresses.parseString(raw), parsed)
+    n.assert_list_equal(list(addresses.parseString(raw)), parsed)
 
 def test():
-    for raw, parsed in testcases:
+    for raw, parsed in TESTCASES:
         yield check, raw, parsed

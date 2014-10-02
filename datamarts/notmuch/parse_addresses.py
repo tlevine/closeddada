@@ -1,8 +1,17 @@
 import pyparsing as p
 
-unquoted_name = p.Combine(p.OneOrMore(p.Word(exclude_chars = '<')))
+# Name part of a person
+unquoted_name = p.Combine(p.OneOrMore(p.Word(''.join(set(p.printables) - {'<'}))))
 quoted_name = p.Group('"' + unquoted_name + p.Suppress('"'))
 name = p.Or([unquoted_name, quoted_name])
-addresses = p.OneOrMore(p.Or([
-    name + p.Suppress('<') + p.Word(p.printables) + p.Suppress('>'),
-    p.Word(printables)]))
+
+# Address itself
+address_only = p.Word(p.printables)
+
+# Combination of name and address
+address = p.Or([
+    name + p.Suppress('<') + address_only + p.Suppress('>'),
+    address_only])
+
+# Many addresses
+addresses = p.OneOrMore(address)
