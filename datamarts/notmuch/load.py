@@ -73,6 +73,7 @@ MAILING_LIST_HEADERS = [
     'List-Unsubscribe', # LISTSERV, "cmail.dickblick", ConstantContact, Mailchimp
     'X-Campaign', # ConstantContact, Mailchimp
     'X-CiviMail-Bounce', # CiviCRM
+    'X-CampaignId', # Loopfuse and others
 ]
 EMAIL_ADDRESS = re.compile(r'''.*([^@"' ]+@[^@"' ]).*''')
 def message(m): 
