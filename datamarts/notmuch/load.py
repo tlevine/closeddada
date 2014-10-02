@@ -9,7 +9,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 from notmuch import Database, Query
 from sqlalchemy import func
-import pyparsing as p
 
 import doeund as m
 
@@ -75,7 +74,7 @@ def message(m):
     subject = m.get_header('subject')
 
     from_name, from_address = addresses.parseString(m.get_header('from'))[0]
-    recipient_names, recipient_addresses = zip(*chain(addresses.parseString(m.get_header(name)) for name in ['to','cc','bcc'))
+    recipient_names, recipient_addresses = zip(*chain(*addresses.parseString(m.get_header(name)) for name in ['to','cc','bcc']))
 
     is_mailing_list = 'undisclosed-recipients' in m.get_header('to') or \
         any(m.get_header(header) != '' for header in MAILING_LIST_HEADERS)
@@ -92,13 +91,6 @@ def message(m):
         recipient_addresses = recipient_names,
         is_mailing_list = is_mailing_list,
     )
-
-unquoted_name = p.Combine(p.OneOrMore(p.Word(exclude_chars = '<')))
-quoted_name = p.Group('"' + unquoted_name + p.Suppress('"'))
-name = p.Or([unquoted_name, quoted_name])
-addresses = p.OneOrMore(p.Or([
-    name + p.Suppress('<') + p.Word(p.printables) + p.Suppress('>'),
-    p.Word(printables)]))
 
 def attachments(message):
     with open(message.get_filename(), 'rb') as fp:
