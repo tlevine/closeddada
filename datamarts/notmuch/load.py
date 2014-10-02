@@ -50,8 +50,12 @@ def update(sessionmaker):
     for i, m in enumerate(q.search_messages()):
         message_id = m.get_message_id()
 
-        if i % 1000 == 0:
+        if i == 0:
+            to_add = []
+        elif i % 100 == 0:
+            session.add_all(to_add)
             session.commit()
+            logger.info('Committed %d messages' % i)
             to_add = []
 
         if message_id in past_messages:
