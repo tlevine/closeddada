@@ -35,14 +35,17 @@ def update(sessionmaker):
 
     session = sessionmaker()
     most_recent = session.query(func.max(NotmuchMessage.datetime)).scalar()
-    if most_recent == None:
-        most_recent = datetime.date(1940, 1, 1)
 
     sql_query = session.query(NotmuchMessage.message_id)
     past_messages = set(row[0] for row in sql_query.distinct())
 
-    start_date = (most_recent.date() - datetime.timedelta(weeks = 1))
-    q = Query(Database(), 'date:%s..' % start_date)
+    if most_recent == None:
+        querystr = ''
+    else:
+        start_date = (most_recent.date() - datetime.timedelta(weeks = 1))
+        querystr = 'date:%s..' % start_date
+
+    q = Query(Database(), querystr)
     q.set_sort(Query.SORT.OLDEST_FIRST)
     for m in q.search_messages():
         message_id = m.get_message_id()
@@ -76,11 +79,8 @@ def message(m):
     filename = m.get_filename()
     subject = m.get_header('subject')
 
-   #from_name, from_address = addresses.parseString(m.get_header('from'))[0]
-   #recipient_names, recipient_addresses = zip(*chain(*addresses.parseString(m.get_header(name)) for name in ['to','cc','bcc']))
-    match = re.match(m.get_header('from'))
+    match = re.match(EMAIL_ADDRESS, m.get_header('from'))
     from_address = None if match == None else match.group(1)
-    from_name = None
 
     is_mailing_list = 'undisclosed-recipients' in m.get_header('to') or \
         any(m.get_header(header) != '' for header in MAILING_LIST_HEADERS)
@@ -91,10 +91,10 @@ def message(m):
         thread_id = m.get_thread_id(),
         filename = filename,
         subject = subject,
-        from_name = from_name,
+      # from_name = from_name,
         from_address = from_address,
-        recipient_names = recipient_names,
-        recipient_addresses = recipient_names,
+      # recipient_names = recipient_names,
+      # recipient_addresses = recipient_names,
         is_mailing_list = is_mailing_list,
     )
 

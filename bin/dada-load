@@ -14,8 +14,8 @@ engine = create_engine('postgres:///tlevine')
 Base.metadata.create_all(engine) 
 
 if __name__ == '__main__':
-    #datamarts.load(engine)
-    fuzzylink.load(engine)
+    datamarts.load(engine)
+    #fuzzylink.load(engine)
     #masterlink.load(engine)
 else:
     from sqlalchemy.orm import sessionmaker

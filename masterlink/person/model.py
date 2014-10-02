@@ -52,7 +52,7 @@ class PersonEmailAddress(Fact):
 PersonEmailAddress.add_union(MuttAlias, (MuttAlias.email_address, Person.id))
 
 NotmuchMessage.add_join([(NotmuchMessage.from_address, PersonEmailAddress.email_address)])
-NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, PersonEmailAddress.email_address)])
+# NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, PersonEmailAddress.email_address)])
 
 class PersonLocation(Fact):
     'Populate this from a CSV file.'
