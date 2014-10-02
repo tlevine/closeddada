@@ -35,6 +35,8 @@ def update(sessionmaker):
 
     session = sessionmaker()
     most_recent = session.query(func.max(NotmuchMessage.datetime)).scalar()
+    if most_recent == None:
+        most_recent = datetime.date(1940, 1, 1)
 
     sql_query = session.query(NotmuchMessage.message_id)
     past_messages = set(row[0] for row in sql_query.distinct())
