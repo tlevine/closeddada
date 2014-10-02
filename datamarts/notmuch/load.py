@@ -69,12 +69,16 @@ MAILING_LIST_HEADERS = [
     'X-Campaign', # ConstantContact, Mailchimp
     'X-CiviMail-Bounce', # CiviCRM
 ]
+EMAIL_ADDRESS = re.compile(r'''.*([^@"' ]+@[^@"' ]).*''')
 def message(m): 
     filename = m.get_filename()
     subject = m.get_header('subject')
 
-    from_name, from_address = addresses.parseString(m.get_header('from'))[0]
+   #from_name, from_address = addresses.parseString(m.get_header('from'))[0]
    #recipient_names, recipient_addresses = zip(*chain(*addresses.parseString(m.get_header(name)) for name in ['to','cc','bcc']))
+    match = re.match(m.get_header('from'))
+    from_address = None if match == None else match.group(1)
+    from_name = None
 
     is_mailing_list = 'undisclosed-recipients' in m.get_header('to') or \
         any(m.get_header(header) != '' for header in MAILING_LIST_HEADERS)
