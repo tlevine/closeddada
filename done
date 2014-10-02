@@ -1,0 +1,14 @@
+In the notmuch importer, figure out how to catch this exception. ::
+
+    terminate called after throwing an instance of 'Xapian::DatabaseModifiedError'
+
+Keep this in mind:
+http://gerardnico.com/wiki/data_modeling/snowflake#many-to-many_relationship
+
+Write services that run on my laptop and phone and ping my server periodically.
+The server will respond with the location of the client.
+Then I can join between datetimes and Tom's location.
+This will help:
+http://pygeoip.readthedocs.org/en/latest/getting-started.html
+
+Add an "is_list" column to notmuch messages.

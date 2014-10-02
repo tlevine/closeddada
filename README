@@ -22,6 +22,8 @@ Piwik database
     Stuff that Piwik tracks for http://thomaslevine.com
 Mutt aliases
     Person and email address
+Server logins
+    Output of the command ``last``, including the IP address from which I logged in
 
 I link the following dimensions quite nicely because there is a clear
 one-to-many relationship.
@@ -31,15 +33,14 @@ Person
 Dates
     Dates and datetimes are converted into one thing.
 
-Many-to-many relationships also work; I
-`use <http://docs.sqlalchemy.org/en/latest/dialects/postgresql.html#sqlalchemy.dialects.postgresql.array>`_
-PostgreSQL's `array type <http://www.postgresql.org/docs/9.1/static/arrays.html>`_.
+Many-to-many relationships are represented as their own cubes;
+there are a few cubes around each of the following concepts.
 
-Fuzzy person
+Fuzzy persons
     Real persons are guessed based on IP addresses, names, &c.
 Topics
     Whether the fact references a particular topic, probably determined based on the presence of specific URLs and other key words.
-Location
+Locations
     I associate the fact with locations based on time zones, persons, topics, &c.
 
 How to use
@@ -93,7 +94,6 @@ Fun ideas
 * How many spaces after a period?
 * Connect website views to emails
 * Length of sentences (Saar Golde's idea)
-* http://www.pcthompson.co.uk/documents/The_Reverse_Star_Schema_v2.1.pdf
 
 Something like OLAP
 ==========================================
@@ -109,23 +109,7 @@ nicely. I name the view with the prefix "cube".
 
 To do
 ========
-In the notmuch importer, figure out how to catch this exception. ::
-
-    terminate called after throwing an instance of 'Xapian::DatabaseModifiedError'
-
-Keep this in mind:
-http://gerardnico.com/wiki/data_modeling/snowflake#many-to-many_relationship
-
-Write services that run on my laptop and phone and ping my server periodically.
-The server will respond with the location of the client.
-Then I can join between datetimes and Tom's location.
-This will help:
-http://pygeoip.readthedocs.org/en/latest/getting-started.html
-
 Switch to the visit and action Piwik API modules, and also add the visitor profile.
 http://piwik.thomaslevine.com/?module=API&method=Live.getVisitorProfile&idSite=2&format=JSON&token_auth=foo&visitorId=bar
 
-
 Make email addresses insensitive of case.
-
-Add an "is_list" column to notmuch messages.
