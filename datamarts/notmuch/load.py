@@ -8,8 +8,8 @@ from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 
 from notmuch import Database, Query
-import pyzmail
 from sqlalchemy import func
+import pyparsing as p
 
 import doeund as m
 
@@ -62,27 +62,6 @@ def offlineimap_is_running():
     pgrep.wait()
     stdout, stderr = pgrep.communicate()
     return len(stdout) > 0
-
-def addresses(pyzm):
-    '''
-    If I rewrite this not to use pyzm, I can use the notmuch indices,
-    and it might be way faster.
-    '''
-    headers = ['to', 'cc', 'bcc']
-    tos = pyzm.get_addresses('to')
-    if len(tos) == 0:
-        from_name = from_address = None
-    else:
-        from_name, from_address = tos[0]
-
-    recipients = list(zip(*chain(*(pyzm.get_addresses(header) for header in headers))))
-    if len(recipients) == 0:
-        recipient_names = recipient_addresses = []
-    else:
-        recipient_names, recipient_addresses = recipients
-
-    return from_name, from_address, recipient_names, recipient_addresses
-
 MAILING_LIST_HEADERS = [
     'List-Id', # Google Groups, Mailman
     'List-Unsubscribe', # LISTSERV, "cmail.dickblick", ConstantContact, Mailchimp
@@ -93,9 +72,8 @@ def message(m):
     filename = m.get_filename()
     subject = m.get_header('subject')
 
-    with open(m.get_filename(), 'rb') as fp:
-        pyzm = pyzmail.PyzMessage.factory(fp)
-    from_name, from_address, recipient_names, recipient_addresses = addresses(pyzm)
+    from_name, from_address = addresses.parseString(m.get_header('from'))[0]
+    recipient_names, recipient_addresses = zip(*chain(addresses.parseString(m.get_header(name)) for name in ['to','cc','bcc'))
 
     is_mailing_list = 'undisclosed-recipients' in m.get_header('to') or \
         any(m.get_header(header) != '' for header in MAILING_LIST_HEADERS)
@@ -112,6 +90,11 @@ def message(m):
         recipient_addresses = recipient_names,
         is_mailing_list = is_mailing_list,
     )
+
+unquoted_name = p.Combine(p.OneOrMore(p.Word(exclude_chars = '<')))
+quoted_name = p.Group('"' + unquoted_name + '"')
+name = p.Or(unquoted_name, quoted_name)
+addresses = p.OneOrMore(name + p.Word(p.printables))
 
 def attachments(message):
     with open(message.get_filename(), 'rb') as fp:
