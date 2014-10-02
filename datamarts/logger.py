@@ -10,6 +10,8 @@ stream = logging.StreamHandler()
 stream.setLevel(logging.INFO)
 logger.addHandler(stream)
 
+'''
 logfile = logging.FileHandler(filename, 'a')
 logfile.setLevel(logging.DEBUG)
 logger.addHandler(logfile)
+'''

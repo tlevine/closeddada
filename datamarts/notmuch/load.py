@@ -47,21 +47,20 @@ def update(sessionmaker):
 
     q = Query(Database(), querystr)
     q.set_sort(Query.SORT.OLDEST_FIRST)
-    for m in q.search_messages():
+    for i, m in enumerate(q.search_messages()):
         message_id = m.get_message_id()
+
+        if i % 1000 == 0:
+            session.commit()
+            to_add = []
+
         if message_id in past_messages:
             logger.debug('Already imported %s' % message_id)
             continue
+
         past_messages.add(message_id)
-
-        session.add(message(m))
-        session.flush() # for foreign key constraints
-
-        # I don't really need these, and it takes a long time.
-    #   session.add_all(attachments(m))
-
-        session.commit()
-        logger.info('Added message "id:%s"' % m.get_message_id())
+        to_add.append(message(m))
+        logger.debug('Added message "id:%s"' % m.get_message_id())
 
 def offlineimap_is_running():
     pgrep = subprocess.Popen(['pgrep', 'offlineimap'], stdout = subprocess.PIPE)
