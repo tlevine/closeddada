@@ -19,4 +19,4 @@ def check_EMAIL_ADDRESS(field, expected):
         n.assert_equal(observed, expected)
     else:
         n.assert_not_equal(observed, None)
-        n.assert_equal(observed.match(1), expected)
+        n.assert_equal(observed.group(1), expected)

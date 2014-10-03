@@ -7,4 +7,4 @@ def offlineimap_is_running(Popen = subprocess.Popen):
     stdout, stderr = pgrep.communicate()
     return len(stdout) > 0
 
-EMAIL_ADDRESS = re.compile(r'''(?:.*<)?([^@"' ]+@[^@"' ])>?$''')
+EMAIL_ADDRESS = re.compile(r'''(?:.*<)?([^@"' ]+@[^@"'> ]+)>?''')
