@@ -13,8 +13,10 @@ import doeund as m
 
 from ..logger import logger
 from .model import NotmuchMessage, NotmuchAttachment
-from .util import EMAIL_ADDRESS, offlineimap_is_running
-
+from .util import (
+    EMAIL_ADDRESS, offlineimap_is_running, received_datetime,
+    MAILING_LIST_HEADERS,
+)
 def update(sessionmaker):
     '''
     Update the notmuch database.
@@ -66,13 +68,6 @@ def update(sessionmaker):
         to_add.append(message(m))
         logger.debug('Added message "id:%s"' % m.get_message_id())
 
-MAILING_LIST_HEADERS = [
-    'List-Id', # Google Groups, Mailman
-    'List-Unsubscribe', # LISTSERV, "cmail.dickblick", ConstantContact, Mailchimp
-    'X-Campaign', # ConstantContact, Mailchimp
-    'X-CiviMail-Bounce', # CiviCRM
-    'X-CampaignId', # Loopfuse and others
-]
 def message(m): 
     filename = m.get_filename()
     subject = m.get_header('subject')
@@ -89,7 +84,7 @@ def message(m):
 
     return NotmuchMessage(
         message_id = m.get_message_id(),
-        datetime = datetime.datetime.fromtimestamp(m.get_date()),
+        datetime = received_datetime(m),
         thread_id = m.get_thread_id(),
         filename = filename,
         subject = subject,
