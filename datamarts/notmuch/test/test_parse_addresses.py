@@ -14,6 +14,7 @@ TESTCASES = [
 def check(raw, parsed):
     n.assert_list_equal(list(parse_addresses(raw)), parsed)
 
+@n.nottest
 def test():
     for raw, parsed in TESTCASES:
         yield check, raw, parsed
