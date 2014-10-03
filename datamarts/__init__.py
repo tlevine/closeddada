@@ -8,7 +8,9 @@ from .facebookchat.model import (
 from .notmuch.model import NotmuchMessage, NotmuchAttachment
 from .twitter.model import TwitterAction, TwitterNameHandle
 from .branchable.model import BranchableLog
-from .piwik.model import PiwikAction, PiwikVisit, PiwikVisitorLocation
+from .piwik.model import (
+    PiwikVisit, PiwikVisitor
+)
 from .muttalias.model import MuttAlias
 from .wtmp.model import Last
 

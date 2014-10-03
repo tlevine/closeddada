@@ -4,7 +4,7 @@ import json
 import datetime
 
 import requests
-from sqlalchemy import desc
+from sqlalchemy import func, create_engine
 
 from ..logger import logger
 from .model import (
@@ -24,13 +24,13 @@ def update(sessionmaker):
             raise ValueError(msg % key)
 
     url = 'mysql+pymysql://dadawarehouse:%s@piwik.thomaslevine.com/piwik'
-    engine = s.create_engine(url % os.environ[mysql_key])
+    engine = create_engine(url % os.environ[mysql_key])
     token = os.environ[key]
 
     session = sessionmaker()
-    prev_idvisit = session.query(PiwikVisit.idvisit).max().scalar()
+    prev_idvisit = session.query(func.max(PiwikVisit.idvisit)).scalar()
 
-    for i, row in enumerate(download(engine, prev_idvisit))):
+    for i, row in enumerate(download(engine, prev_idvisit)):
         if i == 0:
             todo = []
         elif i % 100 == 0:
@@ -42,6 +42,8 @@ def update(sessionmaker):
     session.commit()
 
 def download(engine, prev_idvisit):
+    if prev_idvisit == None:
+        prev_idvisit = -1
     for (
         idvisit,
         idsite,
@@ -55,6 +57,10 @@ def download(engine, prev_idvisit):
         location_longitude,
     ) in engine.execute(VISIT % prev_idvisit):
         location_ip = '.'.join(map(str,map(int,location_ip_binary)))
+        if location_ip.count('.') != 3:
+            logger.error('Problem converting the IP address %s' % location_ip_binary)
+            continue
+
         yield PiwikVisit(
             idvisit =             idvisit,
             idsite =              idsite,

@@ -11,5 +11,6 @@ SELECT
   location_latitude,
   location_longitude
 FROM piwik_log_visit
-WHERE idvisit > '%d';
+WHERE idvisit > '%d'
+ORDER BY idvisit ASC;
 '''
