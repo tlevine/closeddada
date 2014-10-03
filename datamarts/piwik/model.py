@@ -3,7 +3,10 @@ from sqlalchemy.dialects.postgres import CIDR
 
 import doeund as m
 
-class PiwikVisitor(m.Fact):
+class PiwikVisit(
+        select idvisit, idsite, idvisitor, visit_total_actions, location_ip, location_country, location_region, location_city, location_latitude, location_longitude from piwik_log_visit limit 1;
+
+class PiwikVisitor(m.Dimension):
     visitorId = m.Column(s.String, primary_key = True)
     totalVisits = m.Column(s.Integer)
     totalVisitDuration = m.Column(s.Integer)
