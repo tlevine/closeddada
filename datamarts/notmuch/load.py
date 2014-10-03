@@ -3,7 +3,6 @@ import sys
 import re
 import datetime
 from itertools import chain
-import subprocess
 from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 
@@ -14,6 +13,7 @@ import doeund as m
 
 from ..logger import logger
 from .model import NotmuchMessage, NotmuchAttachment
+from .util import EMAIL_ADDRESS, offlineimap_is_running
 
 def update(sessionmaker):
     '''
@@ -66,11 +66,6 @@ def update(sessionmaker):
         to_add.append(message(m))
         logger.debug('Added message "id:%s"' % m.get_message_id())
 
-def offlineimap_is_running():
-    pgrep = subprocess.Popen(['pgrep', 'offlineimap'], stdout = subprocess.PIPE)
-    pgrep.wait()
-    stdout, stderr = pgrep.communicate()
-    return len(stdout) > 0
 MAILING_LIST_HEADERS = [
     'List-Id', # Google Groups, Mailman
     'List-Unsubscribe', # LISTSERV, "cmail.dickblick", ConstantContact, Mailchimp
@@ -78,13 +73,16 @@ MAILING_LIST_HEADERS = [
     'X-CiviMail-Bounce', # CiviCRM
     'X-CampaignId', # Loopfuse and others
 ]
-EMAIL_ADDRESS = re.compile(r'''.*([^@"' ]+@[^@"' ]).*''')
 def message(m): 
     filename = m.get_filename()
     subject = m.get_header('subject')
 
     match = re.match(EMAIL_ADDRESS, m.get_header('from'))
-    from_address = None if match == None else match.group(1)
+    if match == None:
+        from_address = None
+        logger.warning('No from address for id:%s' % m.get_message_id())
+    else:
+        from_address = match.group(1)
 
     is_mailing_list = 'undisclosed-recipients' in m.get_header('to') or \
         any(m.get_header(header) != '' for header in MAILING_LIST_HEADERS)
