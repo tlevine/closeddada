@@ -113,3 +113,7 @@ Switch to the visit and action Piwik API modules, and also add the visitor profi
 http://piwik.thomaslevine.com/?module=API&method=Live.getVisitorProfile&idSite=2&format=JSON&token_auth=foo&visitorId=bar
 
 Make email addresses insensitive of case.
+
+My attempt at checking overlap between email dates and web visits doesn't
+seem to work very well. Maybe I should try finding matches between only the
+first email and first visit? And maybe only within the same hour?
