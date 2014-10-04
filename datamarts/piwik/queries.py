@@ -14,3 +14,12 @@ FROM piwik_log_visit
 WHERE idvisit > '%d'
 ORDER BY idvisit ASC;
 '''
+
+LINK_VISIT_ACTION = '''
+SELECT
+  idvisit,
+  idvisitor,
+  idaction_url
+FROM piwik_log_link_visit_action
+OFFSET %d;
+'''

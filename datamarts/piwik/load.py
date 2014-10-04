@@ -13,6 +13,7 @@ from .model import (
 )
 from .queries import (
     VISIT,
+    LINK_VISIT_ACTION,
 )
 
 def update(sessionmaker):
@@ -30,7 +31,7 @@ def update(sessionmaker):
     session = sessionmaker()
     prev_idvisit = session.query(func.max(PiwikVisit.idvisit)).scalar()
 
-    for i, row in enumerate(download(engine, prev_idvisit)):
+    for i, row in enumerate(visits(engine, prev_idvisit)):
         if i == 0:
             todo = []
         elif i % 100 == 0:
@@ -41,7 +42,16 @@ def update(sessionmaker):
             todo.append(row)
     session.commit()
 
-def download(engine, prev_idvisit):
+def link_visit_actions(engine, count_link_visit_action):
+    if count_link_visit_action == None:
+        count_link_visit_action = 0
+    query = engine.execute(LINK_VISIT_ACTION % count_link_visit_action)
+    for idvisit, idvisitor, idaction_url in query:
+        yield PiwikAction(idvisit = idvisit,
+                          idvisitor = idvisitor,
+                          idaction_url = idaction_url)
+
+def visits(engine, prev_idvisit):
     if prev_idvisit == None:
         prev_idvisit = -1
     for (

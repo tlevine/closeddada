@@ -17,6 +17,17 @@ class PiwikVisit(m.Fact):
     location_latitude = m.Column(s.Float, nullable = True)
     location_longitude = m.Column(s.Float, nullable = True)
 
+class PiwikActionUrl(m.Dimension):
+    id = m.PkColumn()
+    action_url = m.Column(s.String)
+
+class PiwikAction(m.Fact):
+    pk = m.PkColumn()
+    idvisit = m.Column(s.Integer, s.ForeignKey(PiwikVisit.idvisit))
+    idvisitor = m.Column(BYTEA(8))
+    idaction_url = m.Column(s.Integer, s.ForeignKey(PiwikActionUrl.id))
+
+
 # Rather than importing the visitor profile thing from Piwik,
 # I'm just linking to it.
 '''
