@@ -17,11 +17,13 @@ class PiwikVisit(m.Fact):
     location_latitude = m.Column(s.Float, nullable = True)
     location_longitude = m.Column(s.Float, nullable = True)
 
-class PiwikVisitor(m.Dimension):
-    visitorId = m.Column(s.BINARY(8), primary_key = True)
-    totalVisits = m.Column(s.Integer)
-    totalVisitDuration = m.Column(s.Integer)
-    totalActions = m.Column(s.Integer)
-    totalPageViews = m.Column(s.Integer)
-    firstVisitDate = m.Column(s.DateTime)
-    lastVisitDate = m.Column(s.DateTime)
+# Rather than importing the visitor profile thing from Piwik,
+# I'm just linking to it.
+'''
+CREATE OR REPLACE FUNCTION visitor_profile(BYTEA)
+RETURNS TEXT AS $$
+BEGIN
+    RETURN 'http://piwik.thomaslevine.com/index.php?date=2000-01-01,2020-01-01&module=Widgetize&action=iframe&widget=1&idSite=2&period=range&moduleToWidgetize=Live&actionToWidgetize=getVisitorProfilePopup&visitorId=' || encode($1, 'hex');
+END;
+$$ LANGUAGE plpgsql;
+'''
