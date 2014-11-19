@@ -117,3 +117,40 @@ Make email addresses insensitive of case.
 My attempt at checking overlap between email dates and web visits doesn't
 seem to work very well. Maybe I should try finding matches between only the
 first email and first visit? And maybe only within the same hour?
+
+
+
+Switch to Xapian
+==================
+Helpful help
+
+* http://getting-started-with-xapian.readthedocs.org
+* http://survex.com/~olly/talks/modelling-your-data-in-xapian/modelling-your-data-in-xapian/
+
+Put every document into this schema. (All fields are optional.)
+
+* Date
+* Person, maybe
+  * Map email messages to email addresses and then to persons.)
+* IP address
+* Geographical location, maybe
+  * Map IP address to geography.
+  * Map person to geography.
+* Text
+
+My master data could involve these mappings.
+
+* Date to geographical location
+* Person to geographical location
+* IP address to geographical location
+* Date to (my) IP address
+* Person to IP address
+* Geographical location to IP address
+* Date to person (persons I interacted with)
+* IP address to person
+* Geographical location to person
+* Person to dates (that I saw the person)
+* IP address to dates
+* Geographical location to dates.
+
+It's probably not worth doing all of them.
