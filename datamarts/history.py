@@ -3,12 +3,17 @@ import os
 import shlex
 
 from historian_reader.shell import historian
+import xapian
 
-import doeund as m
-from ..logger import logger
-from .model import ShellSession, ShellCommand
+from .logger import logger
 
 HISTORY = os.path.expanduser('~/.dadawarehouse/history')
+CLOSEDDADA = os.path.expanduser('~/.closeddada')
+
+db = xapian.WritableDatabase(os.path.join(CLOSEDDADA, 'history'),
+                             xapian.DB_CREATE_OR_OPEN)
+termgenerator = xapian.TermGenerator()
+termgenerator.set_stemmer(xapian.Stem("en"))
 
 def download():
     RSYNC = ['rsync', '--archive', '--sparse']
@@ -23,18 +28,13 @@ def update(sessionmaker):
     download()
     session = sessionmaker()
     shell_history = os.path.join(HISTORY, 'shell')
-    previous_shells = (row[0] for row in session.query(ShellSession.filename))
+   #previous_shells = (row[0] for row in session.query(ShellSession.filename))
     for log in historian(directory = shell_history, skip = previous_shells):
-        shell_session = ShellSession(filename = log['session'],
-                                     datetime = log['session_date'])
-        todo = [shell_session]
+        filename = log['session']
+        datetime = log['session_date']
         for command_datetime, command_string in log['commands']:
-            command = ShellCommand(
-                shellsession = shell_session,
-                datetime = command_datetime,
-                full_command = command_string)
-            todo.append(command)
-
-        session.add_all(todo)
-        session.commit()
-        logger.info('Inserted commands from shell "%s"' % log['session'])
+            doc = xapian.Doc()
+            termgenerator.set_document(doc)
+            termgenerator.index_text(filename, 1, 'F')
+            termgenerator.index_text(command_string)
+            command_datetime, 
